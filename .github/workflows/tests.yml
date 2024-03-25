@@ -644,7 +644,7 @@ jobs:
 
       - run: |
           sudo apt-get -qq update
-          sudo apt-get -qq install curl
+          sudo apt-get -qq install curl wget
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@1.65.0
