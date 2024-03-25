@@ -620,7 +620,7 @@ jobs:
     needs:
       - linting-done
       - changes
-    runs-on: ubuntu-latest
+    runs-on: dind-xl
 
     strategy:
       fail-fast: false
