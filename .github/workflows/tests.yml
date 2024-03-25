@@ -323,14 +323,15 @@ jobs:
     needs:
       - calculate-test-jobs
       - changes
-    runs-on: ubuntu-latest
+    runs-on: dind-xl
     strategy:
       matrix:
         job:  ${{ fromJson(needs.calculate-test-jobs.outputs.trial_test_matrix) }}
 
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get -qq install xmlsec1
+      - run: sudo apt-get -qq update && sudo apt-get -qq install xmlsec1 curl
+      - run: mkdir -v /var/run/postgresql
       - name: Set up PostgreSQL ${{ matrix.job.postgres-version }}
         if: ${{ matrix.job.postgres-version }}
         # 1. Mount postgres data files onto a tmpfs in-memory filesystem to reduce overhead of docker's overlayfs layer.
@@ -393,7 +394,7 @@ jobs:
       # their build dependencies
       - run: |
           sudo apt-get -qq update
-          sudo apt-get -qq install build-essential libffi-dev python-dev \
+          sudo apt-get -qq install curl build-essential libffi-dev python-dev \
             libxml2-dev libxslt-dev xmlsec1 zlib1g-dev libjpeg-dev libwebp-dev
 
       - uses: actions/setup-python@v5
@@ -448,7 +449,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       # Install libs necessary for PyPy to build binary wheels for dependencies
-      - run: sudo apt-get -qq install xmlsec1 libxml2-dev libxslt-dev
+      - run: sudo apt-get -qq update && sudo apt-get -qq install curl xmlsec1 libxml2-dev libxslt-dev
       - uses: matrix-org/setup-python-poetry@v1
         with:
           python-version: ${{ matrix.python-version }}
@@ -473,7 +474,7 @@ jobs:
     needs:
       - calculate-test-jobs
       - changes
-    runs-on: ubuntu-latest
+    runs-on: dind-xl
     container:
       image: matrixdotorg/sytest-synapse:${{ matrix.job.sytest-tag }}
       volumes:
@@ -519,7 +520,7 @@ jobs:
   export-data:
     if: ${{ !failure() && !cancelled() && needs.changes.outputs.integration == 'true'}} # Allow previous steps to be skipped, but not fail
     needs: [linting-done, portdb, changes]
-    runs-on: ubuntu-latest
+    runs-on: dind-xl
     env:
       TOP: ${{ github.workspace }}
 
@@ -539,7 +540,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get -qq install xmlsec1 postgresql-client
+      - run: sudo apt-get -qq update && sudo apt-get -qq install curl xmlsec1 postgresql-client
       - uses: matrix-org/setup-python-poetry@v1
         with:
           poetry-version: "1.3.2"
@@ -592,7 +593,7 @@ jobs:
           sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
           wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
           sudo apt-get update
-      - run: sudo apt-get -qq install xmlsec1 postgresql-client
+      - run: sudo apt-get -qq update && sudo apt-get -qq install curl xmlsec1 postgresql-client
       - uses: matrix-org/setup-python-poetry@v1
         with:
           python-version: ${{ matrix.python-version }}
@@ -620,7 +621,7 @@ jobs:
     needs:
       - linting-done
       - changes
-    runs-on: ubuntu-latest
+    runs-on: dind-xl
 
     strategy:
       fail-fast: false
@@ -641,6 +642,10 @@ jobs:
         with:
           path: synapse
 
+      - run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install curl wget build-essential
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@1.65.0
       - uses: Swatinem/rust-cache@v2
@@ -653,10 +658,12 @@ jobs:
           cache-dependency-path: complement/go.sum
           go-version-file: complement/go.mod
 
+      - run: go install -v github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@latest
+
         # use p=1 concurrency as GHA boxes are underpowered and don't like running tons of synapses at once.
       - run: |
           set -o pipefail
-          COMPLEMENT_DIR=`pwd`/complement synapse/scripts-dev/complement.sh -p 1 -json 2>&1 | synapse/.ci/scripts/gotestfmt
+          COMPLEMENT_DIR=`pwd`/complement synapse/scripts-dev/complement.sh -p 4 -json 2>&1 | synapse/.ci/scripts/gotestfmt
         shell: bash
         env:
           POSTGRES: ${{ (matrix.database == 'Postgres') && 1 || '' }}
@@ -694,7 +701,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@master
         with:
-            toolchain: nightly-2022-12-01
+            toolchain: nightly-2022-1 2-01
       - uses: Swatinem/rust-cache@v2
 
       - run: cargo bench --no-run

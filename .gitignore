@@ -68,6 +68,7 @@ book/
 # complement
 /complement-*
 /main.tar.gz
+complement/**
 
 # rust
 /target/
