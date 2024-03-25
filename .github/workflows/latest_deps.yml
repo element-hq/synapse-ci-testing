@@ -78,7 +78,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
 
-      - run: sudo apt-get -qq update && sudo apt-get -qq install xmlsec1
+      - run: sudo apt-get -qq update && sudo apt-get -qq install xmlsec1 curl
       - name: Set up PostgreSQL ${{ matrix.postgres-version }}
         if: ${{ matrix.postgres-version }}
         run: |
