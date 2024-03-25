@@ -649,13 +649,13 @@ jobs:
         uses: dtolnay/rust-toolchain@1.65.0
       - uses: Swatinem/rust-cache@v2
 
-      - name: Prepare Complement's Prerequisites
-        run: synapse/.ci/scripts/setup_complement_prerequisites.sh
-
       - uses: actions/setup-go@v5
         with:
           cache-dependency-path: complement/go.sum
           go-version-file: complement/go.mod
+
+      - name: Prepare Complement's Prerequisites
+        run: synapse/.ci/scripts/setup_complement_prerequisites.sh
 
         # use p=1 concurrency as GHA boxes are underpowered and don't like running tons of synapses at once.
       - run: |
