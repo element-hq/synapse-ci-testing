@@ -63,7 +63,7 @@ jobs:
   trial:
     needs: check_repo
     if: needs.check_repo.outputs.should_run_workflow == 'true'
-    runs-on: ubuntu-latest
+    runs-on: dind-xl
     strategy:
       matrix:
         include:
@@ -123,7 +123,7 @@ jobs:
   sytest:
     needs: check_repo
     if: needs.check_repo.outputs.should_run_workflow == 'true'
-    runs-on: ubuntu-latest
+    runs-on: dind-xl
     container:
       image: matrixdotorg/sytest-synapse:testing
       volumes:
@@ -176,7 +176,7 @@ jobs:
   complement:
     needs: check_repo
     if: "!failure() && !cancelled() && needs.check_repo.outputs.should_run_workflow == 'true'"
-    runs-on: ubuntu-latest
+    runs-on: dind-xl
 
     strategy:
       fail-fast: false
