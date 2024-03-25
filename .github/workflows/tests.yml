@@ -641,6 +641,10 @@ jobs:
         with:
           path: synapse
 
+      - run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install curl
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@1.65.0
       - uses: Swatinem/rust-cache@v2
