@@ -323,7 +323,7 @@ jobs:
     needs:
       - calculate-test-jobs
       - changes
-    runs-on: ubuntu-latest
+    runs-on: dind-xl
     strategy:
       matrix:
         job:  ${{ fromJson(needs.calculate-test-jobs.outputs.trial_test_matrix) }}
@@ -473,7 +473,7 @@ jobs:
     needs:
       - calculate-test-jobs
       - changes
-    runs-on: ubuntu-latest
+    runs-on: dind-xl
     container:
       image: matrixdotorg/sytest-synapse:${{ matrix.job.sytest-tag }}
       volumes:
@@ -519,7 +519,7 @@ jobs:
   export-data:
     if: ${{ !failure() && !cancelled() && needs.changes.outputs.integration == 'true'}} # Allow previous steps to be skipped, but not fail
     needs: [linting-done, portdb, changes]
-    runs-on: ubuntu-latest
+    runs-on: dind-xl
     env:
       TOP: ${{ github.workspace }}
 
