@@ -663,7 +663,7 @@ jobs:
         # use p=1 concurrency as GHA boxes are underpowered and don't like running tons of synapses at once.
       - run: |
           set -o pipefail
-          COMPLEMENT_DIR=`pwd`/complement synapse/scripts-dev/complement.sh -p 1 -json 2>&1 | synapse/.ci/scripts/gotestfmt
+          COMPLEMENT_DIR=`pwd`/complement synapse/scripts-dev/complement.sh -p 4 -json 2>&1 | synapse/.ci/scripts/gotestfmt
         shell: bash
         env:
           POSTGRES: ${{ (matrix.database == 'Postgres') && 1 || '' }}
