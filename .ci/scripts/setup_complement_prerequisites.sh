@@ -11,7 +11,8 @@ alias endblock='{ set +x; } 2>/dev/null; func() { echo "::endgroup::"; set -x; }
 
 block Install Complement Dependencies
   sudo apt-get -qq update && sudo apt-get install -qqy libolm3 libolm-dev
-  go install -v github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@latest
+  # `go` cmd is not available in self-hosted ARC environment by default, need to wait until after the setup-go action
+  # go install -v github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@latest
 endblock
 
 block Install custom gotestfmt template

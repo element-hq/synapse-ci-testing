@@ -32,7 +32,7 @@ jobs:
       should_run_workflow: ${{ steps.check_condition.outputs.should_run_workflow }}
     steps:
       - id: check_condition
-        run: echo "should_run_workflow=${{ github.repository == 'element-hq/synapse' }}" >> "$GITHUB_OUTPUT"
+        run: echo "should_run_workflow=${{ github.repository == 'element-hq/synapse-ci-testing' }}" >> "$GITHUB_OUTPUT"
 
   mypy:
     needs: check_repo
