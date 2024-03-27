@@ -620,7 +620,7 @@ jobs:
     needs:
       - linting-done
       - changes
-    runs-on: dind-xl
+    runs-on: dind-2xl
 
     strategy:
       fail-fast: false
