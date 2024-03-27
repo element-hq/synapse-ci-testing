@@ -620,7 +620,7 @@ jobs:
     needs:
       - linting-done
       - changes
-    runs-on: ubuntu-latest
+    runs-on: dind-2xl
 
     strategy:
       fail-fast: false
@@ -641,6 +641,10 @@ jobs:
         with:
           path: synapse
 
+      - run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install curl wget build-essential
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@1.65.0
       - uses: Swatinem/rust-cache@v2
@@ -653,10 +657,12 @@ jobs:
           cache-dependency-path: complement/go.sum
           go-version-file: complement/go.mod
 
+      - run: go install -v github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@latest
+
         # use p=1 concurrency as GHA boxes are underpowered and don't like running tons of synapses at once.
       - run: |
           set -o pipefail
-          COMPLEMENT_DIR=`pwd`/complement synapse/scripts-dev/complement.sh -p 1 -json 2>&1 | synapse/.ci/scripts/gotestfmt
+          COMPLEMENT_DIR=`pwd`/complement synapse/scripts-dev/complement.sh -p 4 -json 2>&1 | synapse/.ci/scripts/gotestfmt
         shell: bash
         env:
           POSTGRES: ${{ (matrix.database == 'Postgres') && 1 || '' }}
